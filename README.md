@@ -100,6 +100,19 @@ Severe weather is by far the most common cause of major outages, accounting for 
   frameborder="0"
 ></iframe>
 
+**Number of Major Outages per Year:**
+
+The number of recorded major outages increased significantly from 2000 to 2011, 
+peaking around 2011 before declining slightly. This upward trend may reflect 
+both increasing grid stress and improved reporting over time.
+
+<iframe
+  src="assets/outages_per_year.html"
+  width="800"
+  height="450"
+  frameborder="0"
+></iframe>
+
 
 ### Bivariate Analysis
 
@@ -286,7 +299,7 @@ The final model uses **RandomForestRegressor** with four features in a single sk
 - `SEASON` (nominal, one-hot encoded, engineered from `MONTH`) — winter storms and summer heat waves are the most damaging weather events. Grouping months into seasons captures this pattern better than raw month numbers, which would treat December and January as numerically far apart despite both being winter months.
 - `LOG_CUSTOMERS` (quantitative, engineered from `CUSTOMERS.AFFECTED`) — customer counts are heavily right-skewed with extreme outliers. Log-transforming compresses the distribution and reduces the influence of extreme values on tree splits, making the feature more informative for the model.
 
-There are no ordinal features. All categorical features are one-hot encoded and all numeric features are median imputed within the pipeline to prevent data leakage.
+In total, the final model uses **3 nominal features** (`CAUSE.CATEGORY`, `CLIMATE.CATEGORY`, `SEASON`) and **1 quantitative feature** (`LOG_CUSTOMERS`), with no ordinal features. All categorical features are one-hot encoded and all numeric features are median imputed within the pipeline to prevent data leakage.
 
 **Modeling algorithm:** RandomForestRegressor was chosen because it captures non-linear interactions between features that LinearRegression cannot model. It is also robust to outliers and works well with mixed feature types.
 
