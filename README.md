@@ -154,7 +154,7 @@ not representative of the actual impact.*
 
 One column with a notably high missingness rate is `CUSTOMERS.AFFECTED`, missing in 655 out of 1,534 rows (~43%). This is likely **NMAR (Not Missing At Random)**. Utility companies self-report outage data to federal agencies, and smaller outages affecting fewer customers are less likely to be formally logged. This means the missingness is tied to the actual value itself — low customer counts go unreported — making it NMAR rather than MAR or MCAR.
 
-To make this column MAR, we would need additional data such as each utility company's internal reporting threshold — the minimum number of customers required before a count gets logged. With that information, we could condition on reporting behavior and explain the missingness without needing the missing value itself.
+To make this column MAR (Missing At Random), we would need additional data such as each utility company's internal reporting threshold — the minimum number of customers required before a count gets logged. With that information, we could condition on reporting behavior and explain the missingness without needing the missing value itself.
 
 ### Missingness Dependency
 
@@ -183,8 +183,6 @@ We used the absolute difference in group means as the test statistic since `TOTA
   height="450"
   frameborder="0"
 ></iframe>
-
-Both tests suggest the missingness of `CUSTOMERS.AFFECTED` is **MAR** — it can be explained by other observed columns rather than being purely random.
 
 
 **Test 3: Does missingness depend on `CLIMATE.CATEGORY`?**
@@ -251,7 +249,9 @@ At the moment an outage begins, a utility company would know:
 
 `OUTAGE.DURATION` itself would NOT be known at prediction time — that is what the model is trying to estimate. `OUTAGE.RESTORATION` would also not be known, since that is the endpoint being predicted.
 
-The **Evaluation metric:** RMSE (Root Mean Squared Error), measured in minutes. RMSE was chosen over R² because it is in the same units as the target, making it more interpretable. It also penalizes large errors more heavily, which matters since severely underestimating a long outage has serious operational consequences.
+
+The **evaluation metric** used is RMSE (Root Mean Squared Error), measured in minutes. RMSE was chosen over R² because it is in the same units as the target, making it more interpretable. It was also chosen over MAE (Mean Absolute Error) because it penalizes large errors more heavily by squaring them, and a severe underestimate of a long outage has much greater operational consequences than a small error, so this extra penalty is appropriate.
+
 
 ---
 
@@ -273,6 +273,7 @@ There are no ordinal features in this model. The pipeline handles all preprocess
 The baseline model is **not a good model**. The test RMSE of 7,614 minutes is nearly 3x the mean outage duration of 2,771 minutes, meaning the average prediction error is larger than the typical outage itself. The gap between train RMSE (5,516) and test RMSE (7,614) also suggests some overfitting. Linear Regression cannot capture non-linear interactions between cause category, geography, and climate that likely drive outage duration. These limitations motivate the improvements made in the final model.
 
 ---
+
 ## Final Model
 
 The final model uses **RandomForestRegressor** with four features in a single sklearn Pipeline.
@@ -303,6 +304,7 @@ There are no ordinal features. All categorical features are one-hot encoded and 
 The final model improved test RMSE by 604 minutes (7.9%) over the baseline. During experimentation, including `U.S._STATE` caused severe overfitting (train RMSE 2,622, test RMSE 7,381, gap of 4,759 min). Removing it reduced the overfit gap to 2,452 minutes and improved test RMSE significantly.
 
 ---
+
 
 ## Fairness Analysis
 
