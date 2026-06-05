@@ -79,6 +79,7 @@ The first few rows of the cleaned DataFrame are shown below:
 To better understand the dataset, we first examine the distribution of individual columns relevant to our prediction task.
 
 **Distribution of Outage Duration**
+
 The distribution of outage duration is heavily right-skewed. Most outages last under 5,000 minutes (~3.5 days), but a small number of extreme events extend well beyond 20,000 minutes (~2 weeks). This skew motivates the log-transformation of related features in our model.
 
 <iframe
@@ -89,6 +90,7 @@ The distribution of outage duration is heavily right-skewed. Most outages last u
 ></iframe>
 
 **Number of Outages by Cause Category**
+
 Severe weather is by far the most common cause of major outages, accounting for nearly half of all events. Intentional attacks are the second most frequent cause.
 
 <iframe
@@ -97,6 +99,7 @@ Severe weather is by far the most common cause of major outages, accounting for 
   height="450"
   frameborder="0"
 ></iframe>
+
 
 #### Bivariate Analysis
 
