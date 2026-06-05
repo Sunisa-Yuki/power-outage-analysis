@@ -251,7 +251,8 @@ At the moment an outage begins, a utility company would know:
 
 `OUTAGE.DURATION` itself would NOT be known at prediction time — that is what the model is trying to estimate. `OUTAGE.RESTORATION` would also not be known, since that is the endpoint being predicted.
 
-**Evaluation metric:** RMSE (Root Mean Squared Error), measured in minutes. RMSE was chosen over R² because it is in the same units as the target, making it more interpretable. It also penalizes large errors more heavily, which matters since severely underestimating a long outage has serious operational consequences.
+The **Evaluation metric:** RMSE (Root Mean Squared Error), measured in minutes. RMSE was chosen over R² because it is in the same units as the target, making it more interpretable. It also penalizes large errors more heavily, which matters since severely underestimating a long outage has serious operational consequences.
+
 ---
 
 ## Baseline Model
@@ -272,22 +273,24 @@ There are no ordinal features in this model. The pipeline handles all preprocess
 The baseline model is **not a good model**. The test RMSE of 7,614 minutes is nearly 3x the mean outage duration of 2,771 minutes, meaning the average prediction error is larger than the typical outage itself. The gap between train RMSE (5,516) and test RMSE (7,614) also suggests some overfitting. Linear Regression cannot capture non-linear interactions between cause category, geography, and climate that likely drive outage duration. These limitations motivate the improvements made in the final model.
 
 ---
-
 ## Final Model
 
-We upgraded to **RandomForestRegressor** with four features, all in a single sklearn Pipeline:
+The final model uses **RandomForestRegressor** with four features in a single sklearn Pipeline.
 
-**New features engineered:**
-- `SEASON` (from `MONTH`): Winter storms and summer heat waves cause longer outages than other seasons. Grouping months into seasons captures this cyclical pattern better than raw month numbers, which treat December and January as far apart.
-- `LOG_CUSTOMERS` (log of `CUSTOMERS.AFFECTED`): Customer counts are heavily right-skewed. Log-transforming compresses extreme values and reduces the influence of outliers on tree splits.
+**Features and justification:**
 
-**Features retained from baseline:**
-- `CAUSE.CATEGORY` — one-hot encoded
-- `CLIMATE.CATEGORY` — one-hot encoded (added to final model)
+- `CAUSE.CATEGORY` (nominal, one-hot encoded) — retained from baseline. Proven significant in hypothesis testing.
+- `CLIMATE.CATEGORY` (nominal, one-hot encoded) — added to final model. Climate conditions affect infrastructure stress and restoration capacity. Areas experiencing extreme El Niño/La Niña episodes may have different grid resilience than normal climate regions.
+- `SEASON` (nominal, one-hot encoded, engineered from `MONTH`) — winter storms and summer heat waves are the most damaging weather events. Grouping months into seasons captures this pattern better than raw month numbers, which would treat December and January as numerically far apart despite both being winter months.
+- `LOG_CUSTOMERS` (quantitative, engineered from `CUSTOMERS.AFFECTED`) — customer counts are heavily right-skewed with extreme outliers. Log-transforming compresses the distribution and reduces the influence of extreme values on tree splits, making the feature more informative for the model.
 
-We used `GridSearchCV` with 5-fold cross validation to tune:
-- `n_estimators` ∈ {100, 200}: number of trees — more trees reduce variance but increase computation
-- `max_depth` ∈ {3, 5, 10, None}: controls overfitting — shallower trees generalize better
+There are no ordinal features. All categorical features are one-hot encoded and all numeric features are median imputed within the pipeline to prevent data leakage.
+
+**Modeling algorithm:** RandomForestRegressor was chosen because it captures non-linear interactions between features that LinearRegression cannot model. It is also robust to outliers and works well with mixed feature types.
+
+**Hyperparameter tuning:** GridSearchCV with 5-fold cross validation was used to search over:
+- `n_estimators` in {100, 200}: more trees reduce variance but increase computation time
+- `max_depth` in {3, 5, 10, None}: shallower trees generalize better while deeper trees risk overfitting
 
 **Best hyperparameters:** `max_depth=5`, `n_estimators=200`
 
@@ -295,9 +298,9 @@ We used `GridSearchCV` with 5-fold cross validation to tune:
 |---|---|---|---|
 | Baseline (LinearRegression) | 5,516.99 min | 7,614.74 min | 2,097 min |
 | Final (RandomForestRegressor) | 4,558.26 min | 7,010.52 min | 2,452 min |
-| **Improvement** | | **604.22 min (~7.9%)** | |
+| **Improvement** | | **604.22 min (7.9%)** | |
 
-The final model improved test RMSE by 604 minutes over the baseline. `RandomForestRegressor` captures non-linear interactions between features that `LinearRegression` cannot model. We also experimented with including `U.S._STATE` as a feature, but found it caused severe overfitting (train RMSE 2,622, test RMSE 7,381, gap of 4,759 min) — removing it improved generalization significantly.
+The final model improved test RMSE by 604 minutes (7.9%) over the baseline. During experimentation, including `U.S._STATE` caused severe overfitting (train RMSE 2,622, test RMSE 7,381, gap of 4,759 min). Removing it reduced the overfit gap to 2,452 minutes and improved test RMSE significantly.
 
 ---
 
