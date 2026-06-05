@@ -1,14 +1,9 @@
 # When the Lights Go Out: Analyzing U.S. Power Outage Severity
 
-**By Yuki Saeli** — (ssaeli@ucsd.edu)
+**By Yuki Saeli** — ssaeli@ucsd.edu
 
-This data science project, conducted at UC San Diego, investigates the 
-patterns and predictors behind major power outage severity in the United 
-States. Starting from raw data, the project walks through exploratory 
-analysis, missingness assessment, hypothesis testing, and predictive 
-modeling — ultimately building a machine learning model that estimates 
-how long a power outage will last given information available at the 
-moment it begins.
+
+This data science project, conducted at UC San Diego for DSC 80, investigates the patterns and predictors behind major power outage severity in the United States. Starting from raw data, the project walks through exploratory analysis, missingness assessment, hypothesis testing, and predictive modeling, ultimately building a machine learning model that estimates how long a power outage will last given information available at the moment it begins.
 
 ---
 
