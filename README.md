@@ -256,12 +256,12 @@ At the moment an outage begins, a utility company would know:
 
 ## Baseline Model
 
-Our baseline uses **Linear Regression** in a single sklearn `Pipeline` with two features:
+The baseline uses **Linear Regression** in a single sklearn Pipeline with two features:
 
-- `CAUSE.CATEGORY` — **nominal**, one-hot encoded using `OneHotEncoder`
-- `CUSTOMERS.AFFECTED` — **quantitative**, median imputed using `SimpleImputer`
+- `CAUSE.CATEGORY` — **nominal**, one-hot encoded using `OneHotEncoder` (7 categories, produces 7 binary columns)
+- `CUSTOMERS.AFFECTED` — **quantitative**, median imputed using `SimpleImputer` to handle 655 missing values
 
-These two features were chosen as the most directly observable at outage onset. The pipeline handles all preprocessing internally to prevent data leakage — the imputer and encoder are fit only on training data.
+There are no ordinal features in this model. The pipeline handles all preprocessing internally to prevent data leakage — the imputer and encoder are fit only on training data, never on the test set.
 
 | Metric | Value |
 |---|---|
@@ -269,7 +269,7 @@ These two features were chosen as the most directly observable at outage onset. 
 | Test RMSE | 7,614.74 minutes |
 | Mean outage duration | 2,771.88 minutes |
 
-The test RMSE of 7,614 minutes is nearly **3x the mean outage duration**, indicating the model is a poor predictor. Linear Regression cannot capture the non-linear interactions between cause, climate, and geography that likely drive outage duration. This motivates our final model.
+The baseline model is **not a good model**. The test RMSE of 7,614 minutes is nearly 3x the mean outage duration of 2,771 minutes, meaning the average prediction error is larger than the typical outage itself. The gap between train RMSE (5,516) and test RMSE (7,614) also suggests some overfitting. Linear Regression cannot capture non-linear interactions between cause category, geography, and climate that likely drive outage duration. These limitations motivate the improvements made in the final model.
 
 ---
 
