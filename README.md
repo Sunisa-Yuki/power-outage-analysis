@@ -353,12 +353,5 @@ With a p-value of 0.6620 > 0.05, we fail to reject H₀. The observed RMSE diffe
 
 ## Conclusion
 
-This project analyzed 1,534 major U.S. power outages from 2000 to 2016, building a machine learning model to predict outage duration. Key findings include:
-
-- Severe weather is the most common cause of outages and is associated with significantly longer durations
-- The missingness of customer count data is systematic and depends on outage cause category
-- A Random Forest model with engineered features (SEASON, LOG_CUSTOMERS) improved prediction by 604 minutes (7.9%) over the baseline
-- The model does not show evidence of unfairness across climate groups
-
-The project demonstrates that outage duration can be partially predicted from information available at the time an outage begins, providing a foundation for more sophisticated real-time prediction systems.
+This project analyzed 1,534 major U.S. power outages from 2000 to 2016, building a machine learning model to predict outage duration given information available at the moment an outage begins. Through exploratory analysis, we found that severe weather is the most common cause of outages and is strongly associated with longer durations. The missingness analysis revealed that missing customer count data is systematic rather than random, depending on outage cause and electricity price. A Random Forest model with engineered features including SEASON and LOG_CUSTOMERS improved prediction by 604 minutes (7.9%) over the baseline Linear Regression model. Finally, the fairness analysis found no statistically significant evidence that the model performs differently across climate groups, suggesting the model generalizes reasonably well across different climate conditions. While outage duration remains difficult to predict precisely due to its high variability, this project demonstrates that meaningful signal exists in features available at outage onset.
 
