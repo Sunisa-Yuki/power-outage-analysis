@@ -1,16 +1,33 @@
 # When the Lights Go Out: Analyzing U.S. Power Outage Severity
 
-By Yuki Saeli | DSC 80, UCSD Spring 2026
+**By Yuki Saeli** — (ssaeli@ucsd.edu)
+
+This data science project, conducted at UC San Diego, investigates the 
+patterns and predictors behind major power outage severity in the United 
+States. Starting from raw data, the project walks through exploratory 
+analysis, missingness assessment, hypothesis testing, and predictive 
+modeling — ultimately building a machine learning model that estimates 
+how long a power outage will last given information available at the 
+moment it begins.
 
 ---
 
 ## Introduction
 
-In this project, I examined a dataset of major power outages across the continental U.S. from January 2000 to July 2016. These outages were compiled by Purdue University's Laboratory for Advancing Sustainable Critical Infrastructure and include geographic, climatic, economic, and infrastructure characteristics of each event.
+This project analyzes a dataset of major power outages across the continental 
+U.S. from January 2000 to July 2016, sourced from Purdue University's 
+Laboratory for Advancing Sustainable Critical Infrastructure 
+([dataset link](https://engineering.purdue.edu/LASCI/research-data/outages/outagerisks)).
+
+
+Power outages are costly disruptions affecting millions of people and causing billions of dollars in economic losses each year. 
+Being able to predict how long an outage will last gives energy companies, grid operators, and policymakers a powerful tool for resource planning and emergency response.
+
 
 **The central question of this project is: Can we predict the duration of a major power outage given information known at the time the outage begins?**
 
-This question matters because outage duration directly determines how long communities are left without power, driving economic losses, public safety risks, and emergency response costs. If energy companies can predict duration at the moment an outage starts, they can pre-position repair crews, issue accurate restoration estimates, and allocate resources more effectively — before the situation worsens.
+This matters because outage duration directly determines how long communities are left without power. If companies can estimate duration at the moment an outage starts, they can pre-position repair crews, issue accurate public restoration estimates, and allocate resources before the situation worsens.
+
 
 The original dataset contains **1,534 rows**, each corresponding to one major outage event, and 57 columns. The columns most relevant to our question are described below:
 
