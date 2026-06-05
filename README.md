@@ -328,7 +328,7 @@ The final model improved test RMSE by 604 minutes (7.9%) over the baseline. Duri
 - **Group Y (normal):** `CLIMATE.CATEGORY` = `'normal'`
 - **Evaluation metric:** RMSE
 - **Test statistic:** Absolute difference in RMSE between the two groups
-- **Null Hypothesis (H₀):** The model is fair. Its RMSE for extreme and normal climate groups is roughly the same — any difference is due to random chance.
+- **Null Hypothesis (H₀):** The model is fair. Its RMSE for extreme and normal climate groups is roughly the same, and any difference is due to random chance.
 - **Alternative Hypothesis (H₁):** The model is unfair. Its RMSE for extreme climate states is higher than for normal climate states.
 - **Significance level:** α = 0.05
 - **Method:** Permutation test (1,000 shuffles)
@@ -338,7 +338,7 @@ The final model improved test RMSE by 604 minutes (7.9%) over the baseline. Duri
 | Extreme climate (warm/cold) | 6,164.88 minutes |
 | Normal climate | 8,383.15 minutes |
 | Observed difference | 2,218.27 minutes |
-| **P-value** | **0.6620** |
+| P-value | 0.6620 |
 
 <iframe
   src="assets/fairness_test.html"
@@ -347,4 +347,18 @@ The final model improved test RMSE by 604 minutes (7.9%) over the baseline. Duri
   frameborder="0"
 ></iframe>
 
-With a p-value of **0.6620 > 0.05**, we **fail to reject H₀**. The observed RMSE difference between extreme and normal climate groups is not statistically significant — it falls well within the range we would expect by random chance alone. We cannot conclude that the model is unfair with respect to climate category. Interestingly, the model actually performs better on extreme climate outages (RMSE 6,164) than normal climate outages (RMSE 8,383), suggesting normal climate outages have more varied and harder-to-predict causes.
+With a p-value of 0.6620 > 0.05, we fail to reject H₀. The observed RMSE difference between extreme and normal climate groups is not statistically significant, falling well within the range we would expect by random chance alone. We cannot conclude that the model is unfair with respect to climate category. Interestingly, the model actually performs better on extreme climate outages (RMSE 6,164) than normal climate outages (RMSE 8,383), suggesting normal climate outages have more varied and harder-to-predict causes.
+
+---
+
+## Conclusion
+
+This project analyzed 1,534 major U.S. power outages from 2000 to 2016, building a machine learning model to predict outage duration. Key findings include:
+
+- Severe weather is the most common cause of outages and is associated with significantly longer durations
+- The missingness of customer count data is systematic and depends on outage cause category
+- A Random Forest model with engineered features (SEASON, LOG_CUSTOMERS) improved prediction by 604 minutes (7.9%) over the baseline
+- The model does not show evidence of unfairness across climate groups
+
+The project demonstrates that outage duration can be partially predicted from information available at the time an outage begins, providing a foundation for more sophisticated real-time prediction systems.
+
