@@ -208,13 +208,17 @@ Tests 1 and 2 confirm the missingness is **MAR** — explainable by other observ
 
 **Question:** Do weather-related outages last significantly longer than non-weather-related outages?
 
-This question is motivated by the box plot above, which suggested severe weather outages have longer durations and more extreme outliers. We formally test this before using `CAUSE.CATEGORY` as a model feature.
+This question is motivated by the EDA in the previous section, which showed severe weather outages have longer durations and more extreme outliers. A formal test confirms whether this pattern is statistically significant before using `CAUSE.CATEGORY` as a model feature.
 
-- **Null Hypothesis (H₀):** Weather-related and non-weather-related outages have the same mean duration. Any observed difference is due to random chance.
-- **Alternative Hypothesis (H₁):** Weather-related outages have a longer mean duration than non-weather-related outages.
-- **Test statistic:** Difference in group means (weather mean − non-weather mean)
-- **Significance level:** α = 0.05
-- **Method:** Permutation test (1,000 shuffles)
+**Null Hypothesis (H₀):** Weather-related and non-weather-related outages have the same mean duration. Any observed difference is due to random chance.
+
+**Alternative Hypothesis (H₁):** Weather-related outages have a longer mean duration than non-weather-related outages.
+
+**Test statistic:** Difference in group means (weather − non-weather). This is a natural choice since we are directly comparing average durations between two groups.
+
+**Significance level:** α = 0.05, a standard threshold in statistical testing.
+
+**Method:** Permutation test with 1,000 shuffles. A permutation test is appropriate here because it makes no distributional assumptions about outage durations, which are heavily right-skewed and would violate the assumptions of a t-test.
 
 Weather-related outages had a mean duration of 3,899.7 minutes vs. 1,499.9 minutes for non-weather outages — an observed difference of **2,399.9 minutes**. In 1,000 permutations, no simulated statistic came close to this value.
 
@@ -225,7 +229,9 @@ Weather-related outages had a mean duration of 3,899.7 minutes vs. 1,499.9 minut
   frameborder="0"
 ></iframe>
 
-**p-value = 0.0000.** We reject H₀. The data is consistent with weather-related outages lasting significantly longer. This is not a randomized controlled trial — we cannot claim causation — but the result strongly justifies including `CAUSE.CATEGORY` as a feature in our prediction model.
+The red dashed line marks the observed difference of 2,399.9 minutes, which falls far beyond the entire null distribution.
+
+**p-value = 0.0000.** We reject H₀. The data is consistent with weather-related outages lasting significantly longer on average. Since this is observational data and not a randomized controlled trial, we cannot claim causation — only that there is a strong association between weather-related causes and longer outage durations. This result justifies including `CAUSE.CATEGORY` as a feature in our prediction model.
 
 ---
 
