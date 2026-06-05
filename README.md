@@ -103,7 +103,7 @@ Severe weather is by far the most common cause of major outages, accounting for 
 
 ### Bivariate Analysis
 
-Next, we explore relationships between pairs of columns to identify patterns that may be useful for prediction.
+Next, we explore relationships between pairs of columns to identify patterns that may be useful for prediction.
 
 **Outage Duration by Cause Category:**
 
@@ -142,23 +142,29 @@ The table below shows average outage severity metrics grouped by cause category,
 | intentional attack | 521.9 | 92.5 | 18753.4 | 332 |
 | islanding | 200.5 | 77.5 | 7232.7 | 44
 
+*Note: The mean customers affected for fuel supply emergency shows 1.0 because only 
+1 out of 38 outages in this category has a recorded customer count. The value is 
+not representative of the actual impact.*
+
 ---
 
 ## Assessment of Missingness
 
 ### NMAR Analysis
 
-Several columns contain missing values, but `CUSTOMERS.AFFECTED` (655 missing, ~43%) is likely **NMAR (Not Missing At Random)**. Utility companies self-report outage data to federal agencies, and smaller outages affecting fewer customers are less likely to be formally logged. This means the missingness is tied to the actual value itself — low customer counts go unreported — making it NMAR rather than MAR or MCAR.
+One column with a notably high missingness rate is `CUSTOMERS.AFFECTED`, missing in 655 out of 1,534 rows (~43%). This is likely **NMAR (Not Missing At Random)**. Utility companies self-report outage data to federal agencies, and smaller outages affecting fewer customers are less likely to be formally logged. This means the missingness is tied to the actual value itself — low customer counts go unreported — making it NMAR rather than MAR or MCAR.
 
 To make this column MAR, we would need additional data such as each utility company's internal reporting threshold — the minimum number of customers required before a count gets logged. With that information, we could condition on reporting behavior and explain the missingness without needing the missing value itself.
 
 ### Missingness Dependency
 
-We tested whether the missingness of `CUSTOMERS.AFFECTED` depends on other observed columns using permutation tests.
+To investigate whether the missingness of `CUSTOMERS.AFFECTED` depends on other observed columns, permutation tests were run at a significance level of α = 0.05.
 
 **Test 1: Does missingness depend on `CAUSE.CATEGORY`?**
 
-We used TVD (Total Variation Distance) as the test statistic since `CAUSE.CATEGORY` is categorical. The observed TVD was 0.7558, and the p-value was 0.0000 — we reject H₀. The missingness of `CUSTOMERS.AFFECTED` depends on cause category: certain outage types (e.g., small equipment failures) are systematically less likely to have customer counts recorded than others (e.g., major weather events).
+Since `CAUSE.CATEGORY` is categorical, TVD (Total Variation Distance) is used as the test statistic. This measures how different the distribution of cause categories is between rows where `CUSTOMERS.AFFECTED` is missing vs. not missing.
+
+Observed TVD = 0.7558, p-value = 0.0000. We reject H₀ — the missingness of `CUSTOMERS.AFFECTED` **does** depend on cause category. Certain outage types are systematically less likely to have customer counts recorded than others.
 
 <iframe
   src="assets/missingness_test.html"
@@ -179,6 +185,22 @@ We used the absolute difference in group means as the test statistic since `TOTA
 ></iframe>
 
 Both tests suggest the missingness of `CUSTOMERS.AFFECTED` is **MAR** — it can be explained by other observed columns rather than being purely random.
+
+
+**Test 3: Does missingness depend on `CLIMATE.CATEGORY`?**
+
+Since `CLIMATE.CATEGORY` is categorical, TVD is used as the test statistic.
+
+Observed TVD = 0.0265, p-value = 0.5190. We fail to reject H₀ — the missingness of `CUSTOMERS.AFFECTED` does **NOT** depend on climate category. The observed TVD falls well within the null distribution, confirming no meaningful relationship between climate episode and whether customer counts get reported.
+
+<iframe
+  src="assets/missingness_climate.html"
+  width="800"
+  height="450"
+  frameborder="0"
+></iframe>
+
+Tests 1 and 2 suggest the missingness is **MAR** — explainable by other observed columns. Test 3 confirms that not all columns are related to the missingness pattern.
 
 ---
 
