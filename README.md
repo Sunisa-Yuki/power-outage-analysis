@@ -74,11 +74,11 @@ The first few rows of the cleaned DataFrame are shown below:
 | 2015 | 7 | Minnesota | severe weather | warm | 1740.0 | 250000.0 | 2015-07-18 02:00:00 | 2015-07-19 07:00:00 |
 
 ### Exploratory Data Analysis
-#### Univariate Analysis
+### Univariate Analysis
 
 To better understand the dataset, we first examine the distribution of individual columns relevant to our prediction task.
 
-**Distribution of Outage Duration**
+**Distribution of Outage Duration:**
 
 The distribution of outage duration is heavily right-skewed. Most outages last under 5,000 minutes (~3.5 days), but a small number of extreme events extend well beyond 20,000 minutes (~2 weeks). This skew motivates the log-transformation of related features in our model.
 
@@ -89,7 +89,7 @@ The distribution of outage duration is heavily right-skewed. Most outages last u
   frameborder="0"
 ></iframe>
 
-**Number of Outages by Cause Category**
+**Number of Outages by Cause Category:**
 
 Severe weather is by far the most common cause of major outages, accounting for nearly half of all events. Intentional attacks are the second most frequent cause.
 
@@ -101,11 +101,12 @@ Severe weather is by far the most common cause of major outages, accounting for 
 ></iframe>
 
 
-#### Bivariate Analysis
+### Bivariate Analysis
 
 Next, we explore relationships between pairs of columns to identify patterns that may be useful for prediction.
 
-**Outage Duration by Cause Category**
+**Outage Duration by Cause Category:**
+
 Fuel supply emergencies have the longest and most variable durations. Intentional attacks resolve the fastest. Severe weather shows many extreme outliers despite a low median — meaning most weather outages are short, but a few can last weeks. This pattern suggests cause category is a strong predictor of outage duration.
 
 <iframe
@@ -115,7 +116,8 @@ Fuel supply emergencies have the longest and most variable durations. Intentiona
   frameborder="0"
 ></iframe>
 
-**Customers Affected vs. Outage Duration**
+**Customers Affected vs. Outage Duration:**
+
 There is a loose positive relationship between customers affected and outage duration, but the pattern varies heavily by cause category, confirming that cause plays an important moderating role.
 
 <iframe
