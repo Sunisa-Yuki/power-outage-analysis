@@ -43,6 +43,9 @@ The original dataset contains **1,534 rows**, each corresponding to one major ou
 | `OUTAGE.START` | Combined timestamp of outage start date and time |
 | `OUTAGE.RESTORATION` | Combined timestamp of power restoration date and time |
 
+
+
+
 ---
 
 ## Data Cleaning and Exploratory Data Analysis
@@ -51,28 +54,31 @@ The original dataset contains **1,534 rows**, each corresponding to one major ou
 
 We performed the following cleaning steps, each motivated by how the data was originally collected and stored:
 
-1. **Loaded the Excel file with `header=5`** to skip 5 rows of metadata, then dropped the first data row which contained measurement units (e.g., "yr", "min") rather than actual data.
+1. **Skipped metadata rows** — the Excel file contains 5 rows of metadata before the actual header. Loading with `header=5` and dropping the first data row, which contained measurement units rather than actual values, gave us a clean starting point.
 
-2. **Combined date and time columns into Timestamps.** The outage start date and time were stored in two separate columns (`OUTAGE.START.DATE` and `OUTAGE.START.TIME`). We combined these into a single `pd.Timestamp` column called `OUTAGE.START` using `pd.to_datetime`. The same was done for restoration, creating `OUTAGE.RESTORATION`. The original split columns were dropped.
+2. **Combined timestamp columns** — the outage start date and time were stored in two separate columns. Combining `OUTAGE.START.DATE` and `OUTAGE.START.TIME` into a single `pd.Timestamp` column called `OUTAGE.START` made the data easier to work with. The same was done for restoration, creating `OUTAGE.RESTORATION`. The original split columns were then dropped.
 
-3. **Selected relevant columns** — we kept only the 12 columns relevant to our research question and prediction task, dropping the remaining 45 columns.
+3. **Converted numeric columns** — several numeric columns were read as object dtype from Excel. Converting them using `pd.to_numeric(..., errors='coerce')` ensured all downstream calculations operated on correctly typed data, with non-numeric values replaced by `NaN`.
 
-4. **Converted numeric columns** from object dtype to numeric using `pd.to_numeric(..., errors='coerce')`, since Excel files often read numbers as strings.
+4. **Replaced zero values** — zeros in `OUTAGE.DURATION` and `CUSTOMERS.AFFECTED` were replaced with `NaN`, since a true zero is not meaningful for a major outage event and most likely indicates missing or unreported data.
 
-5. **Replaced 0 values** in `OUTAGE.DURATION` and `CUSTOMERS.AFFECTED` with `NaN`. A true zero would mean an outage lasted 0 minutes or affected 0 customers — neither is meaningful for a major outage event, so these are treated as missing data.
 
 The first few rows of the cleaned DataFrame are shown below:
 
-| YEAR | MONTH | U.S._STATE | CLIMATE.CATEGORY | CAUSE.CATEGORY | OUTAGE.DURATION | CUSTOMERS.AFFECTED | OUTAGE.START |
-|---|---|---|---|---|---|---|---|
-| 2011 | 7 | Minnesota | normal | severe weather | 3060.0 | 70000.0 | 2011-07-01 17:00:00 |
-| 2014 | 5 | Minnesota | normal | intentional attack | 1.0 | NaN | 2014-05-11 18:38:00 |
-| 2010 | 10 | Minnesota | cold | severe weather | 3000.0 | 70000.0 | 2010-10-26 20:00:00 |
-| 2012 | 6 | Minnesota | normal | severe weather | 2550.0 | 68200.0 | 2012-06-19 04:30:00 |
-| 2015 | 7 | Minnesota | warm | severe weather | 1740.0 | 250000.0 | 2015-07-18 02:00:00 |
+| YEAR | MONTH | U.S._STATE | CAUSE.CATEGORY | CLIMATE.CATEGORY | OUTAGE.DURATION | CUSTOMERS.AFFECTED | OUTAGE.START | OUTAGE.RESTORATION |
+|---|---|---|---|---|---|---|---|---|
+| 2011 | 7 | Minnesota | severe weather | normal | 3060.0 | 70000.0 | 2011-07-01 17:00:00 | 2011-07-03 20:00:00 |
+| 2014 | 5 | Minnesota | intentional attack | normal | 1.0 | NaN | 2014-05-11 18:38:00 | 2014-05-11 18:39:00 |
+| 2010 | 10 | Minnesota | severe weather | cold | 3000.0 | 70000.0 | 2010-10-26 20:00:00 | 2010-10-28 22:00:00 |
+| 2012 | 6 | Minnesota | severe weather | normal | 2550.0 | 68200.0 | 2012-06-19 04:30:00 | 2012-06-20 23:00:00 |
+| 2015 | 7 | Minnesota | severe weather | warm | 1740.0 | 250000.0 | 2015-07-18 02:00:00 | 2015-07-19 07:00:00 |
 
-### Univariate Analysis
+### Exploratory Data Analysis
+#### Univariate Analysis
 
+To better understand the dataset, we first examine the distribution of individual columns relevant to our prediction task.
+
+**Distribution of Outage Duration**
 The distribution of outage duration is heavily right-skewed. Most outages last under 5,000 minutes (~3.5 days), but a small number of extreme events extend well beyond 20,000 minutes (~2 weeks). This skew motivates the log-transformation of related features in our model.
 
 <iframe
@@ -82,6 +88,7 @@ The distribution of outage duration is heavily right-skewed. Most outages last u
   frameborder="0"
 ></iframe>
 
+**Number of Outages by Cause Category**
 Severe weather is by far the most common cause of major outages, accounting for nearly half of all events. Intentional attacks are the second most frequent cause.
 
 <iframe
@@ -91,8 +98,11 @@ Severe weather is by far the most common cause of major outages, accounting for 
   frameborder="0"
 ></iframe>
 
-### Bivariate Analysis
+#### Bivariate Analysis
 
+Next, we explore relationships between pairs of columns to identify patterns that may be useful for prediction.
+
+**Outage Duration by Cause Category**
 Fuel supply emergencies have the longest and most variable durations. Intentional attacks resolve the fastest. Severe weather shows many extreme outliers despite a low median — meaning most weather outages are short, but a few can last weeks. This pattern suggests cause category is a strong predictor of outage duration.
 
 <iframe
@@ -102,6 +112,7 @@ Fuel supply emergencies have the longest and most variable durations. Intentiona
   frameborder="0"
 ></iframe>
 
+**Customers Affected vs. Outage Duration**
 There is a loose positive relationship between customers affected and outage duration, but the pattern varies heavily by cause category, confirming that cause plays an important moderating role.
 
 <iframe
@@ -111,19 +122,20 @@ There is a loose positive relationship between customers affected and outage dur
   frameborder="0"
 ></iframe>
 
-### Interesting Aggregates
+#### Interesting Aggregates
 
 The table below shows average outage severity metrics grouped by cause category, sorted by mean duration. Fuel supply emergencies stand out as the most severe on average, while intentional attacks are the least severe despite being the second most common cause.
 
+
 | Cause Category | Mean Duration (min) | Median Duration (min) | Mean Customers Affected | Count |
 |---|---|---|---|---|
-| fuel supply emergency | 10226.5 | 5970.5 | 212583.7 | 38 |
-| severe weather | 3659.7 | 2250.0 | 189533.6 | 741 |
-| public appeal | 1980.3 | 1320.0 | 143950.0 | 69 |
-| equipment failure | 1810.4 | 540.0 | 119952.6 | 35 |
-| system operability disruption | 899.5 | 240.0 | 211923.7 | 83 |
-| intentional attack | 429.4 | 283.0 | 3567.2 | 418 |
-| islanding | 200.6 | 95.5 | 34169.3 | 14 |
+| fuel supply emergency | 13484.0 | 3960.0 | 1.0 | 38 |
+| severe weather | 3899.7 | 2464.0 | 190971.9 | 741 |
+| equipment failure | 1850.6 | 224.0 | 105450.6 | 54 |
+| public appeal | 1468.4 | 455.0 | 15999.4 | 69 |
+| system operability disruption | 747.1 | 222.0 | 211066.0 | 120 |
+| intentional attack | 521.9 | 92.5 | 18753.4 | 332 |
+| islanding | 200.5 | 77.5 | 7232.7 | 44
 
 ---
 
