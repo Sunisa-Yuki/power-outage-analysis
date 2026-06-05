@@ -237,21 +237,21 @@ The red dashed line marks the observed difference of 2,399.9 minutes, which fall
 
 ## Framing a Prediction Problem
 
+
 **Prediction task:** Predict `OUTAGE.DURATION` (in minutes) — a **regression** problem.
 
-We chose `OUTAGE.DURATION` as our response variable because it is the most direct measure of outage severity. It determines how long communities are left without power and drives economic and safety impacts downstream.
+`OUTAGE.DURATION` was chosen as the response variable because it is the most direct measure of outage severity. It determines how long communities are left without power and drives economic and safety consequences downstream.
 
 At the moment an outage begins, a utility company would know:
 - `CAUSE.CATEGORY` — the reported cause is identified within the first hours
-- `CLIMATE.CATEGORY` — climate conditions are known before the outage
+- `CLIMATE.CATEGORY` — climate conditions are known before the outage starts
 - `U.S._STATE` — location is immediately known
-- `MONTH` — calendar month is always known (used to engineer SEASON)
+- `MONTH` — calendar month is always known, used to engineer a SEASON feature
 - `CUSTOMERS.AFFECTED` — estimated from outage scope and SCADA data at onset
 
-We would **NOT** know `OUTAGE.DURATION` at prediction time — that is what we are trying to predict. We also would not know `OUTAGE.RESTORATION`, since that is the endpoint we're estimating.
+`OUTAGE.DURATION` itself would NOT be known at prediction time — that is what the model is trying to estimate. `OUTAGE.RESTORATION` would also not be known, since that is the endpoint being predicted.
 
-**Evaluation metric:** RMSE (Root Mean Squared Error), measured in minutes. We chose RMSE over R² because it is in the same units as our target, making it more interpretable. It also penalizes large errors heavily, which matters since severely underestimating a long outage has serious operational consequences.
-
+**Evaluation metric:** RMSE (Root Mean Squared Error), measured in minutes. RMSE was chosen over R² because it is in the same units as the target, making it more interpretable. It also penalizes large errors more heavily, which matters since severely underestimating a long outage has serious operational consequences.
 ---
 
 ## Baseline Model
