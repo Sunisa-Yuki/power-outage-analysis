@@ -200,7 +200,7 @@ Observed TVD = 0.0265, p-value = 0.5190. We fail to reject H₀ — the missingn
   frameborder="0"
 ></iframe>
 
-Tests 1 and 2 suggest the missingness is **MAR** — explainable by other observed columns. Test 3 confirms that not all columns are related to the missingness pattern.
+Tests 1 and 2 confirm the missingness is **MAR** — explainable by other observed columns. Test 3 confirms that not all columns are related to the missingness pattern.
 
 ---
 
