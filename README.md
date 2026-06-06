@@ -366,20 +366,19 @@ This behavior is expected because extremely long outages are relatively rare in 
   frameborder="0"
 ></iframe>
 
-With a p-value of 0.9050 > 0.05, we fail to reject the null hypothesis. 
-The observed difference in RMSE between extreme and normal climate groups 
-(1,397 minutes) is not statistically significant, falling well within 
+With a p-value of 0.9050 > 0.05, we fail to reject the null hypothesis.
+The observed difference in RMSE between extreme and normal climate groups
+(1,397 minutes) is not statistically significant, falling well within
 the range of differences we would expect by random chance alone.
 
-We cannot conclude that our model is unfair with respect to climate category. 
-Interestingly, the model actually performs better on extreme climate outages 
-(RMSE 6,261) than normal climate outages (RMSE 7,659), suggesting normal 
-climate outages are harder to predict, likely because they have more 
-varied causes beyond just weather.
+We cannot conclude that our model is unfair with respect to climate category.
+Although the model's RMSE is lower for extreme climate outages than for
+normal climate outages, the permutation test indicates that this difference
+is not statistically significant.
 
-Note: While the raw RMSE gap appears large, the permutation test shows 
-this magnitude of difference is not unusual given the variability in our 
-test set.
+Note: While the raw RMSE gap appears large, the permutation test suggests
+that a difference of this magnitude is not unusual given the variability
+present in the test data.
 
 ---
 
@@ -392,4 +391,4 @@ Through exploratory analysis, severe weather emerged as the most common cause of
 
 A Random Forest model with engineered features including SEASON and LOG_CUSTOMERS improved prediction by 604 minutes (7.9%) over the baseline Linear Regression model. The fairness analysis found no statistically significant evidence that the model performs differently across climate groups, suggesting it generalizes reasonably well across different climate conditions.
 
-While outage duration remains difficult to predict precisely due to its high variability, this project demonstrates that meaningful signal exists in features available at outage onset.
+While outage duration remains difficult to predict precisely due to its high variability, this project demonstrates that meaningful signal exists in features available at outage onset. Future work could incorporate additional infrastructure, weather, and utility-level variables to further improve outage duration predictions.
