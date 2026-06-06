@@ -312,6 +312,18 @@ In total, the final model uses **3 nominal features** (`CAUSE.CATEGORY`, `CLIMAT
 
 The final model improved test RMSE by 604 minutes (7.9%) over the baseline. During experimentation, including `U.S._STATE` caused severe overfitting (train RMSE 2,622, test RMSE 7,381, gap of 4,759 min). Removing it reduced the overfit gap to 2,452 minutes and improved test RMSE significantly.
 
+
+**Predicted vs Actual Outage Duration:**
+
+The plot below compares predicted vs actual outage duration on the test set. The red dashed line represents perfect predictions. Points close to the line indicate accurate predictions. The model predicts short outages reasonably well, but consistently underestimates very long outages above 10,000 minutes, reflecting the high variability and right skew of outage durations.
+
+<iframe
+  src="assets/predicted_vs_actual.html"
+  width="800"
+  height="450"
+  frameborder="0"
+></iframe>
+
 ---
 
 
@@ -328,12 +340,13 @@ The final model improved test RMSE by 604 minutes (7.9%) over the baseline. Duri
 - **Significance level:** α = 0.05
 - **Method:** Permutation test (1,000 shuffles)
 
+
 | Group | RMSE |
 |---|---|
-| Extreme climate (warm/cold) | 6,164.88 minutes |
-| Normal climate | 8,383.15 minutes |
-| Observed difference | 2,218.27 minutes |
-| P-value | 0.6620 |
+| Extreme climate (warm/cold) | 6,261.95 minutes |
+| Normal climate | 7,659.36 minutes |
+| Observed difference | 1,397.41 minutes |
+| P-value | 0.9050 |
 
 <iframe
   src="assets/fairness_test.html"
@@ -342,7 +355,20 @@ The final model improved test RMSE by 604 minutes (7.9%) over the baseline. Duri
   frameborder="0"
 ></iframe>
 
-With a p-value of 0.6620 > 0.05, we fail to reject H₀. The observed RMSE difference between extreme and normal climate groups is not statistically significant, falling well within the range we would expect by random chance alone. We cannot conclude that the model is unfair with respect to climate category. Interestingly, the model actually performs better on extreme climate outages (RMSE 6,164) than normal climate outages (RMSE 8,383), suggesting normal climate outages have more varied and harder-to-predict causes.
+With a p-value of 0.9050 > 0.05, we fail to reject the null hypothesis. 
+The observed difference in RMSE between extreme and normal climate groups 
+(1,397 minutes) is not statistically significant, falling well within 
+the range of differences we would expect by random chance alone.
+
+We cannot conclude that our model is unfair with respect to climate category. 
+Interestingly, the model actually performs better on extreme climate outages 
+(RMSE 6,261) than normal climate outages (RMSE 7,659), suggesting normal 
+climate outages are harder to predict, likely because they have more 
+varied causes beyond just weather.
+
+Note: While the raw RMSE gap appears large, the permutation test shows 
+this magnitude of difference is not unusual given the variability in our 
+test set.
 
 ---
 
