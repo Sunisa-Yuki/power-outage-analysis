@@ -160,9 +160,11 @@ not representative of the actual impact.*
 
 ### NMAR Analysis
 
-One column with a notably high missingness rate is `CUSTOMERS.AFFECTED`, missing in 655 out of 1,534 rows (~43%). This is likely **NMAR (Not Missing At Random)**. Utility companies self-report outage data to federal agencies, and smaller outages affecting fewer customers are less likely to be formally logged. This means the missingness is tied to the actual value itself — low customer counts go unreported — making it NMAR rather than MAR or MCAR.
+One column with a notably high missingness rate is `CUSTOMERS.AFFECTED`, missing in 655 out of 1,534 rows (approximately 43%). This column may be partially NMAR (Not Missing At Random), since smaller outages affecting fewer customers may be less likely to be formally reported by utility companies.
 
-To make this column MAR (Missing At Random), we would need additional data such as each utility company's internal reporting threshold — the minimum number of customers required before a count gets logged. With that information, we could condition on reporting behavior and explain the missingness without needing the missing value itself.
+Utility companies self-report outage data to federal agencies, meaning the probability that a customer count is recorded may depend on the actual number of customers affected. If smaller outages are less likely to be reported, then the missingness depends on the missing value itself, which is characteristic of an NMAR mechanism.
+
+To make this column MAR (Missing At Random), we would need additional data such as each utility company's internal reporting threshold, or the minimum number of customers affected before an outage is formally documented. With that information, we could condition on reporting behavior and explain the missingness without needing the missing value itself.
 
 ### Missingness Dependency
 
@@ -206,7 +208,9 @@ Observed TVD = 0.0265, p-value = 0.5190. We fail to reject H₀ — the missingn
   frameborder="0"
 ></iframe>
 
-Tests 1 and 2 confirm the missingness is **MAR** — explainable by other observed columns. Test 3 confirms that not all columns are related to the missingness pattern.
+The permutation tests provide evidence that the missingness of `CUSTOMERS.AFFECTED` depends on observed variables such as `CAUSE.CATEGORY` and `TOTAL.PRICE`, suggesting a MAR mechanism may also explain part of the missingness pattern. Test 3 confirms that not all columns are related to the missingness process.
+
+While the missingness may still be partially NMAR due to utility reporting behavior, the observed dependence on other recorded variables indicates that MAR is also a plausible explanation.
 
 ---
 
@@ -278,7 +282,9 @@ In total, the baseline model uses **1 nominal feature** and **1 quantitative fea
 | Test RMSE | 7,614.74 minutes |
 | Mean outage duration | 2,771.88 minutes |
 
-The baseline model is **not a good model**. The test RMSE of 7,614 minutes is nearly 3x the mean outage duration of 2,771 minutes, meaning the average prediction error is larger than the typical outage itself. The gap between train RMSE (5,516) and test RMSE (7,614) also suggests some overfitting. Linear Regression cannot capture non-linear interactions between cause category, geography, and climate that likely drive outage duration. These limitations motivate the improvements made in the final model.
+The baseline model serves as a useful benchmark but has limited predictive power, motivating the use of more flexible non-linear models. The test RMSE of 7,614 minutes is nearly 3x the mean outage duration of 2,771 minutes, meaning the average prediction error is larger than the typical outage itself. The gap between train RMSE (5,516 minutes) and test RMSE (7,614 minutes) also suggests some overfitting. Linear Regression cannot capture non-linear interactions between cause category, geography, and climate that likely drive outage duration. These limitations motivate the improvements made in the final model.
+
+
 
 
 ---
@@ -315,7 +321,7 @@ The final model improved test RMSE by 604 minutes (7.9%) over the baseline. Duri
 
 **Predicted vs Actual Outage Duration:**
 
-The plot below compares predicted vs actual outage duration on the test set. The red dashed line represents perfect predictions. Points close to the line indicate accurate predictions. The model predicts short outages reasonably well, but consistently underestimates very long outages above 10,000 minutes, reflecting the high variability and right skew of outage durations.
+The plot below compares predicted and actual outage duration on the test set. The red dashed line represents perfect predictions, while points farther from the line indicate larger prediction errors.
 
 <iframe
   src="assets/predicted_vs_actual.html"
@@ -323,6 +329,11 @@ The plot below compares predicted vs actual outage duration on the test set. The
   height="450"
   frameborder="0"
 ></iframe>
+
+The model predicts short outages reasonably well, but consistently underestimates very long outages above 10,000 minutes, reflecting the high variability and right-skewed nature of outage durations.
+
+This behavior is expected because extremely long outages are relatively rare in the training data, making them difficult for the model to learn accurately. Despite this limitation, the model still improves substantially over the baseline model in terms of test RMSE.
+
 
 ---
 
