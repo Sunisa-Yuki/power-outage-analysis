@@ -247,22 +247,38 @@ The red dashed line marks the observed difference of 2,399.9 minutes, which fall
 
 ## Framing a Prediction Problem
 
+**Prediction Problem:** Can we predict the duration of a major power outage given information known at the time the outage begins?
 
-**Prediction task:** Predict `OUTAGE.DURATION` (in minutes) — a **regression** problem.
+**Type:** Regression (continuous numerical output)
 
-`OUTAGE.DURATION` was chosen as the response variable because it is the most direct measure of outage severity. It determines how long communities are left without power and drives economic and safety consequences downstream.
+### Why this problem?
+If a grid operator knows an outage is likely to last a long time before restoration is complete, they can pre-position repair crews, issue more accurate public estimates, and prioritize resource deployment. Our model targets this real operational need.
+
+**Response Variable:** `OUTAGE.DURATION` (minutes)
+We chose this because outage duration is the most direct measure of outage severity. It determines how long communities are left without power and drives economic and safety impacts.
+
+**Features available at time of prediction:**
 
 At the moment an outage begins, a utility company would know:
-- `CAUSE.CATEGORY` — the reported cause is identified within the first hours
-- `CLIMATE.CATEGORY` — climate conditions are known before the outage starts
-- `U.S._STATE` — location is immediately known
-- `MONTH` — calendar month is always known, used to engineer a SEASON feature
-- `CUSTOMERS.AFFECTED` — estimated from outage scope and SCADA data at onset
 
-`OUTAGE.DURATION` itself would NOT be known at prediction time — that is what the model is trying to estimate. `OUTAGE.RESTORATION` would also not be known, since that is the endpoint being predicted.
+- `CAUSE.CATEGORY` — the initial cause is identified within the first hours from field reports and SCADA systems
+- `CUSTOMERS.AFFECTED` — estimated from SCADA monitoring systems at outage onset
+- `CLIMATE.CATEGORY` — El Niño/La Niña climate episodes are determined by NOAA before the outage and are publicly available
+- `U.S._STATE` — location is immediately known when an outage is reported
+- `MONTH` — calendar month is always known, used to engineer the SEASON feature
 
+We would NOT know the following at prediction time:
+- `OUTAGE.DURATION` — this is what we are predicting
+- `OUTAGE.RESTORATION` — this is the endpoint we are trying to estimate
 
-The **evaluation metric** used is RMSE (Root Mean Squared Error), measured in minutes. RMSE was chosen over R² because it is in the same units as the target, making it more interpretable. It was also chosen over MAE (Mean Absolute Error) because it penalizes large errors more heavily by squaring them, and a severe underestimate of a long outage has much greater operational consequences than a small error, so this extra penalty is appropriate.
+**Evaluation Metric:** RMSE (Root Mean Squared Error), measured in minutes. Chosen over R² because it is in the same units as the target. Chosen over MAE because it penalizes large errors more heavily, which matters since severely underestimating a long outage has serious operational consequences.
+
+| Field | Value |
+|---|---|
+| Type | Regression |
+| Target | `OUTAGE.DURATION` (minutes) |
+| Metric | RMSE |
+| Features | `CAUSE.CATEGORY`, `CLIMATE.CATEGORY`, `U.S._STATE`, `MONTH`, `CUSTOMERS.AFFECTED` |
 
 
 ---
